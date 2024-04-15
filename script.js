@@ -8,37 +8,25 @@ const images = [
   { url: "https://picsum.photos/id/239/200/300" },
 ];
 
+const imageLoad = (url) => {
+  return `<img src='${url}' />`;
+};
 
-// Define function to download an image
-async function downloadImage(image) {
+const all = async () => {
   try {
-    const response = await fetch(image.url);
-    if (!response.ok) {
-      throw new Error(`Failed to load image's URL: ${image.url}`);
-    }
-    const blob = await response.blob();
-    return URL.createObjectURL(blob);
-  } catch (error) {
-    throw new Error(`Failed to load image's URL: ${image.url}`);
-  }
-}
-
-// Add event listener to button
-btn.addEventListener("click", async () => {
-  try {
-    // Download images concurrently
-    const imagePromises = images.map(downloadImage);
-    const urls = await Promise.all(imagePromises);
-
-    // Display images on the webpage
-    output.innerHTML = ""; // Clear previous content
-    urls.forEach(url => {
-      const img = document.createElement("img");
-      img.src = url;
-      output.appendChild(img);
+    const gallery = await Promise.all(images.map((val) => fetch(val.url)));
+    gallery.forEach((val) => {
+      output.insertAdjacentHTML("beforeend", imageLoad(val.url));
     });
-  } catch (error) {
-    console.error(error.message);
-  }
-});
 
+    return gallery;
+  } catch (err) {
+    return "failed to load images";
+  }
+};
+
+btn.addEventListener("click", () => {
+  images.forEach((val) => {
+      output.insertAdjacentHTML("beforeend", imageLoad(val.url));
+    });
+});
